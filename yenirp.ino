@@ -1,9 +1,13 @@
-int in1 = 10;
-int in2 = 11;
-int in3 = 8;
-int in4 = 9;
+#include <Servo.h>
+Servo myServo;
+int in1 = 9;
+int in2 = 10;
+int in3 = 7;
+int in4 = 8;
 int e1 = 5;
 int e2 = 6;
+int servo1v = 12;
+int position = 0;
 void setup() {
   Serial.begin(115200); // opens serial port, sets data rate to 9600 bps
   pinMode(in1, OUTPUT);
@@ -12,6 +16,10 @@ void setup() {
   pinMode(in4, OUTPUT);
   pinMode(e1, OUTPUT);
   pinMode(e2, OUTPUT);
+  pinMode(13, OUTPUT);
+  pinMode(servo1v, OUTPUT);
+  myServo.attach(11);
+  myServo.write(0);
 }
 void Default()
 {
@@ -20,11 +28,26 @@ void Default()
   digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
 }
+
+void TurnLeft()
+{
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+}
+void TurnRight()
+{
+  digitalWrite(in3,HIGH);
+  digitalWrite(in4,LOW);
+}
+
 void loop()
 {
+  //digitalWrite(servo1v, HIGH);
   // send data only when you receive data:
-  analogWrite(e1, 200);
-  analogWrite(e2, 200);
+  digitalWrite(13,LOW);
+  digitalWrite(servo1v, HIGH);
+  analogWrite(e1, 85);//80
+  analogWrite(e2, 90);//90
   if (Serial.available())
   {
     char value = Serial.read();
@@ -32,19 +55,44 @@ void loop()
 
     if (value == 'l')
     {
-      digitalWrite(in1, HIGH);
-      digitalWrite(in2, LOW);
-      delay(1000);
+      TurnLeft();
     }
     else if(value == 'r')
     {
-      digitalWrite(in3,HIGH);
-      digitalWrite(in4,LOW);
-      delay(1000);
+      TurnRight();
     }
-    Default();
+    else if(value == 'f')//front back
+    {
+      digitalWrite(in4,LOW);
+      digitalWrite(in3,HIGH);
+      digitalWrite(in2,LOW);
+      digitalWrite(in1,HIGH);
+    }
+    else if(value == 'b')//turn back
+    {
+      digitalWrite(in3,LOW);
+      digitalWrite(in4,HIGH);
+      digitalWrite(in1,LOW);
+      digitalWrite(in2,HIGH);
+    }
+    else if(value == 's')
+    {
+      //position += 60;
+      myServo.write(90);
+      delay(1000);
+      myServo.write();
+      delay(1000);
+      myServo.write(0);
+      //nesneyi tespit ederse 
+        //break et
+    }
+    else
+    {
+      Default();
+    }
+
+    delay(100);
   }
-  delay(1000);
 }
   /*
     else if()
